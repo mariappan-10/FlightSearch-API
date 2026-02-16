@@ -8,12 +8,26 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "Flight Search API", Version = "v1" });
 });
+
+// CORS policy - allow only http://localhost:5173/
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowDevServer", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
 builder.Services.AddScoped<IAirportService, AirportService>();
 builder.Services.AddScoped<IFlightService, FlightService>();
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+app.UseCors("AllowDevServer");
 app.UseAuthorization();
 app.MapControllers();
 
